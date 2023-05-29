@@ -5,7 +5,7 @@ public class Main {
     
     // Define the maximum temperature and cooling rate for the annealing process
     private static final double MAX_TEMPERATURE = 10000;
-    private static final double COOLING_RATE = 0.03;
+    private static final double COOLING_RATE = 0.0003;
     private static int[] values = {68, 64, 47, 55, 72, 53, 81, 60, 72, 80, 62, 42, 48, 47, 68, 51, 48, 68, 83, 55, 48, 44, 49, 68, 63, 71, 82, 55, 60, 63, 56, 75, 42, 76, 42, 60, 75, 68, 67, 42, 71, 58, 66, 72, 67, 78, 49, 50, 51};
     private static int[] weights = {21, 11, 11, 10, 14, 12, 12, 14, 17, 13, 11, 13, 17, 14, 16, 10, 18, 10, 16, 17, 19, 12, 12, 16, 16, 13, 17, 12, 16, 13, 21, 11, 11, 10, 14, 12, 12, 14, 17, 13, 11, 13, 17, 14, 16, 10, 18, 10, 16};
 
@@ -28,14 +28,50 @@ public class Main {
         Random random = new Random();
         
         // Start the simulated annealing process
-        // ..............
-
-
-
+        boolean[] solution = new boolean[values.length];
+        double coolingRate = COOLING_RATE;
+        double stopingCriterion = 0.0;
         
-        // Print the best solution found
+        for(double initialTemperature = 1000;initialTemperature>= stopingCriterion ;initialTemperature-=coolingRate) {      	
+        	currentSolution = neigbourhood();
+        	//currentSolution = neighbourhood(solution);
+        	if(calculateAcceptanceProbability(calculateValue(solution),calculateValue(currentSolution),initialTemperature)==1) {
+        		for (int i = 0;i<solution.length;i++){
+        			solution[i]=currentSolution[i];
+        			}
+        	}
+        	else {
+        		if(calculateAcceptanceProbability(calculateValue(solution),calculateValue(currentSolution),initialTemperature)+random.nextFloat()>1) {
+        			for (int i = 0;i<solution.length;i++){
+        			solution[i]=currentSolution[i];
+        			}
+        		}
+        	}
+        }
+        bestSolution = solution;
+        bestValue =calculateValue(bestSolution);
         System.out.println("Best Solution: " + Arrays.toString(bestSolution));
         System.out.println("Best Value: " + bestValue);
+    }
+    
+      
+    private static boolean[] neigbourhood() {
+    	int weight = 0;
+    	boolean[] solution = new boolean[values.length];
+    	for (int i = 0;i<solution.length;i++){
+    		Random random = new Random();
+			if(random.nextInt(2) == 1) {
+				solution[i]=true;
+				weight += weights[i];
+				if(weight > knapsackCapacity) {
+					solution[i]=false;
+					weight-=weights[i];
+				
+				}
+			}
+    	}
+    	return solution;
+    	
     }
     
     // Helper method to calculate the fitness value of a solution
